@@ -1,0 +1,65 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Repository {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String?
+  description String?
+  owner       String?
+  issues      Issue[]
+}
+
+model Issue {
+  id           String           @id @default(cuid())
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  title        String?
+  description  String?
+  status       EnumIssueStatus?
+  comments     Comment[]
+  repository   Repository?      @relation(fields: [repositoryId], references: [id])
+  repositoryId String?
+  assignee     String?
+}
+
+model Label {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String?
+  color     String?
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String?
+  author    String?
+  issue     Issue?   @relation(fields: [issueId], references: [id])
+  issueId   String?
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  firstName String?
+  lastName  String?
+  username  String   @unique
+  email     String?  @unique
+  password  String
+  roles     Json
+}
+
+enum EnumIssueStatus {
+  Option1
+}
